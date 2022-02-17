@@ -4,24 +4,19 @@ import Register from "./pages/register/Register";
 import Profile from "./pages/profile/Profile";
 import {
   BrowserRouter as Router,
-  Route
+  Route,
+  Routes
 } from "react-router-dom";
 
 function App() {
   return (
     <Router>
-        <Route path="/">
-          <Home/>
-        </Route>
-        <Route path="/login">
-          <Login/>
-        </Route>
-        <Route path="/register">
-          <Register/>
-        </Route>
-        <Route path="/profile/:username">
-          <Profile/>
-        </Route>
+      <Routes>
+        <Route path="/" element={<Home/>}/>
+        <Route path="/login" element={<Login/>}/>
+        <Route path="/register" element={<Register/>}/>
+        <Route path="/profile/:username" element={<Profile/>}/>
+      </Routes>
     </Router>
   )
 }
