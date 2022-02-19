@@ -1,38 +1,33 @@
-const router = require("express").Router();
-const User = require("../models/User");
-const bcrypt = require("bcrypt");
-const { register } = require("../services/auth");
+const express = require("express");
+const { register, login } = require("../services/auth");
+
+const router = express.Router();
+
 //REGISTER
 router.post("/register", async (req, res) => {
   const { body } = req;
   const { username, password, email } = body;
-  
+
   try {
-      const user = await register({username, password, email});
-      
-      res.status(201).json(user);
+    const user = await register({ username, password, email });
+
+    res.status(201).json(user);
   } catch (error) {
-      res.status(500).json(error);
+    res.status(500).json(error);
   }
 });
 
 //LOGIN
-router.post("/login", async (req, res) => {
+router.post("/login", async (req, res, next) => {
+  const { body } = req;
+  const { email, password } = body;
+
   try {
-    const user = await User.findOne({
-      email: req.body.email,
-    });
-    !user && res.status(404).json("User not found!");
-
-    const validPassword = await bcrypt.compare(
-      req.body.password,
-      user.password
-    );
-    !validPassword && res.status(400).json("wrong password");
-
-    res.status(200).json(user);
+      const user = await login(email,password);
+    
+      res.status(200).json(user);
   } catch (err) {
-    res.status(500).json(err);
+      next(err);
   }
 });
 
