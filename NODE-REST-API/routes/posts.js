@@ -1,9 +1,10 @@
 const router = require("express").Router();
+const { verifyToken } = require("../middlewares");
 const Post = require("../models/Post");
 const User = require("../models/User");
 
 //create a post
-router.post("/", async (req, res) => {
+router.post("/",verifyToken ,async (req, res) => {
   const newPost = new Post(req.body);
   try {
     const savedPost = await newPost.save();
@@ -14,7 +15,7 @@ router.post("/", async (req, res) => {
 });
 
 //update a post
-router.put("/:id", async (req, res) => {
+router.put("/:id",verifyToken ,async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
     if (post.userId === req.body.userId) {
@@ -29,7 +30,7 @@ router.put("/:id", async (req, res) => {
 });
 
 //delete a post
-router.delete("/:id", async (req, res) => {
+router.delete("/:id",verifyToken ,async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
     if (post.userId === req.body.userId) {
@@ -44,7 +45,7 @@ router.delete("/:id", async (req, res) => {
 });
 
 //like/dislike a post
-router.put("/:id/like", async (req, res) => {
+router.put("/:id/like",verifyToken ,async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
     if (!post.likes.includes(req.body.userId)) {
@@ -60,7 +61,7 @@ router.put("/:id/like", async (req, res) => {
 });
 
 //get a post
-router.get("/:id", async (req, res) => {
+router.get("/:id",verifyToken ,async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
     res.status(200).json(post);
