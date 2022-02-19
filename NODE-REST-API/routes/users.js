@@ -1,42 +1,31 @@
 const User = require("../models/User");
 const router = require("express").Router();
 const bcrypt = require("bcrypt");
+const { verifyToken, isSameUserOrAdmin } = require("../middlewares");
 
 //update user
-router.put("/:id", async (req, res) => {
-  if (req.body.userId == req.params.id || req.body.isAdmin) {
-    if (req.body.password) {
-      try {
-        const salt = await bcrypt.genSalt(10);
-        req.body.password = await bcrypt.hash(req.body.password, salt);
-      } catch (err) {
-        return res.status(500).json(err);
-      }
-    }
-    try {
-      const user = await User.findByIdAndUpdate(req.params.id, {
-        $set: req.body,
-      });
-      res.status(200).json("account has been updated");
-    } catch (err) {
-      res.status(500).json(err);
-    }
-  } else {
-    return res.status(403).json("You can only update your account!");
+router.put("/:id", verifyToken, isSameUserOrAdmin, async (req, res) => {
+  const { params, body } = req;
+
+  try {
+    let updatedUser = await User.findByIdAndUpdate(params.id, {
+      $set: body,
+    });
+    updatedUser = await User.findById(params.id);
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    res.status(500).json(error);
   }
 });
 
 //delete user
-router.delete("/:id", async (req, res) => {
-  if (req.body.userId == req.params.id || req.body.isAdmin) {
-    try {
-      const user = await User.findByIdAndDelete(req.params.id);
-      res.status(200).json("account has been deleted");
-    } catch (err) {
-      res.status(500).json(err);
-    }
-  } else {
-    return res.status(403).json("You can only delete your account!");
+router.delete("/:id", verifyToken, isSameUserOrAdmin, async (req, res) => {
+  const { params } = req;
+  try {
+    const user = await User.findByIdAndDelete(params.id);
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json(500);
   }
 });
 
@@ -61,7 +50,7 @@ router.get("/friends/:userId", async (req, res) => {
     const user = await User.findById(req.params.userId);
     const friends = await Promise.all(
       user.following.map((friendId) => {
-       return User.findById(friendId);
+        return User.findById(friendId);
       })
     );
     let friendsList = [];
@@ -76,13 +65,13 @@ router.get("/friends/:userId", async (req, res) => {
 });
 
 //follow a user
-router.put("/:id/follow", async (req, res) => {
-  if (req.body.userId !== req.params.id) {
+router.put("/:id/follow", verifyToken, async (req, res) => {
+  if (req.user._id !== req.params.id) {
     try {
       const user = await User.findById(req.params.id);
-      const currentUser = await User.findById(req.body.userId);
+      const currentUser = await User.findById(req.user._id);
       if (!user.followers.includes(req.body.userId)) {
-        await user.updateOne({ $push: { followers: req.body.userId } });
+        await user.updateOne({ $push: { followers: req.user._id } });
         await currentUser.updateOne({ $push: { following: req.params.id } });
         res.status(200).json("User has been followed!");
       } else {
@@ -97,17 +86,17 @@ router.put("/:id/follow", async (req, res) => {
 });
 
 //unfollow a user
-router.put("/:id/unfollow", async (req, res) => {
-  if (req.body.userId !== req.params.id) {
+router.put("/:id/unfollow", verifyToken, async (req, res) => {
+  if (req.user._id !== req.params.id) {
     try {
       const user = await User.findById(req.params.id);
-      const currentUser = await User.findById(req.body.userId);
-      if (user.followers.includes(req.body.userId)) {
-        await user.updateOne({ $pull: { followers: req.body.userId } });
+      const currentUser = await User.findById(req.user._id);
+      if (user.followers.includes(req.user._id)) {
+        await user.updateOne({ $pull: { followers: req.user._id } });
         await currentUser.updateOne({ $pull: { following: req.params.id } });
-        res.status(200).json("User has been unfollowed!");
+        res.status(200).json("User has been unfollowed");
       } else {
-        res.status(403).json("You already unfollowed this user!");
+        res.status(403).json("You don't follow this user");
       }
     } catch (err) {
       res.status(500).json(err);
