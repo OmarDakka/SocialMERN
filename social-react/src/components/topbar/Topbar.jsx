@@ -3,10 +3,18 @@ import { Search, Person, Chat, Notifications } from "@mui/icons-material";
 import {Link} from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
+import { logoutCall } from "../../apiCalls";
+import { Navigate } from "react-router";
 
 export default function Topbar() {
-  const {user} = useContext(AuthContext);
   const PF = process.env.REACT_APP_PUBLIC_FOLDER;
+  const {user,isFetching, error, dispatch} = useContext(AuthContext)
+
+  const handleLogout = (e) => {
+    e.preventDefault();
+    logoutCall(dispatch)
+    Navigate("/login");
+  }
   return (
     <div className="topbarContainer">
       <div className="topbarLeft">
@@ -40,6 +48,9 @@ export default function Topbar() {
           <div className="topbarIconItem">
             <Notifications />
             <span className="topbarIconBadge">1</span>
+          </div>
+          <div className="topbarIconItem">
+            <button className="logoutButton" onClick={handleLogout}>Logout</button>
           </div>
         </div>
         <Link to={`/profile/${user.username}`}>
