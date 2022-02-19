@@ -1,5 +1,5 @@
 import "./share.css";
-import { PermMedia, Label, Room, EmojiEmotions, Login, Cancel } from "@mui/icons-material";
+import { PermMedia, Label, Room, EmojiEmotions, Cancel } from "@mui/icons-material";
 import { useContext, useRef, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import axios from "axios";
