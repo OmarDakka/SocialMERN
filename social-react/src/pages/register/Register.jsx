@@ -30,6 +30,15 @@ export default function Register() {
 
   }
 
+  const handleLoginButton = async (e) => {
+    e.preventDefault();
+    try {
+      navigate("/login");
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return (
     <div className="login">
       <div className="loginWrapper">
@@ -58,8 +67,8 @@ export default function Register() {
               className="loginInput"
               ref={passwordConfirmation}
             />
-            <button className="loginButton" type="submit">Sign Up</button>
-            <button className="loginRegisterButton">Log Into Account</button>
+            <button className="loginButton" type="submit">Sign Up</button>            
+            <button className="loginRegisterButton" onClick={handleLoginButton}>Log Into Account</button>
           </form>
         </div>
       </div>

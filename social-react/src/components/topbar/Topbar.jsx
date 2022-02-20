@@ -4,16 +4,17 @@ import {Link} from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { logoutCall } from "../../apiCalls";
-import { Navigate } from "react-router";
+import {useNavigate} from "react-router-dom";
 
 export default function Topbar() {
   const PF = process.env.REACT_APP_PUBLIC_FOLDER;
   const {user,isFetching, error, dispatch} = useContext(AuthContext)
+  const navigate = useNavigate();
 
   const handleLogout = (e) => {
     e.preventDefault();
     logoutCall(dispatch)
-    Navigate("/login");
+    navigate("/login");
   }
   return (
     <div className="topbarContainer">

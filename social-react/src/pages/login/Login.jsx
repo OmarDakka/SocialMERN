@@ -1,10 +1,12 @@
 import { useRef, useContext } from "react";
+import {useNavigate} from "react-router";
 import "./login.css";
 import { loginCall } from "../../apiCalls";
 import { AuthContext } from "../../context/AuthContext";
 import {CircularProgress} from "@mui/material";
 
 export default function Login() {
+  const navigate = useNavigate();
   const email = useRef();
   const password = useRef();
   const {user,isFetching, error, dispatch} = useContext(AuthContext)
@@ -13,6 +15,16 @@ export default function Login() {
     e.preventDefault();
     loginCall({email: email.current.value,password: password.current.value},dispatch)
   };
+
+  const handleCreateButton = (e) => {
+    e.preventDefault();
+    try {
+      navigate("/register");
+    } catch (error) {
+      console.log(error);
+    }
+
+  }
   console.log(user);
   return (
     <div className="login">
@@ -42,7 +54,7 @@ export default function Login() {
             />
             <button className="loginButton" disabled={isFetching}>{isFetching ? <CircularProgress color="inherit" size="25px"/> : "Login"}</button>
             <span className="loginForgot">Forgot Password?</span>
-            <button className="loginRegisterButton" disabled={isFetching}>
+            <button className="loginRegisterButton" disabled={isFetching} onClick={handleCreateButton}>
             {isFetching ? <CircularProgress color="inherit" size="25px"/> : "Create a new account"}
             </button>
           </form>
